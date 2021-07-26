@@ -1,4 +1,4 @@
-import React, { FC, useRef, useEffect, useState } from 'react';
+import { FC, useRef, useEffect, useState } from 'react';
 import { select, Selection } from 'd3-selection';
 
 // 4)
@@ -73,26 +73,32 @@ const Part2_Join: FC = () => {
 
 
 
-        // 3) multiple bars
+        // 3) multiple bars WHICH are rendered in DOM
         // selection
-        // .selectAll('rect')
-        // .data(mockData)
-        // .attr('width', 100)
-        // .attr('height', d => d.units)
-        // .attr('fill', d => d.color)
-        // .attr('x',  (_, i) => i * 100)
+          // .selectAll('rect')
+          // .data(mockData)
+          // .attr('width', 100)
+          // .attr('height', d => d.units)
+          // .attr('fill', d => d.color)
+          // .attr('x',  (_, i) => i * 100)
 
+        // Important it is additional "rect" before "rect" which is in DOM
         // 2) by using array.
           // selection
-          // .data(mockData)
-          // .append('rect')
-          // // from mock.data
-          // .attr('width', d => d.width)
-          // .attr('height', d => d.height)
-          // .attr('fill', d => d.color)
+          //   .data([{
+          //     width: 200,
+          //     height: 150,
+          //     color: 'orange',
+          //   }])
+          //   .append('rect')
+          //   // from mock.data
+          //   .attr('width', d => d.width)
+          //   .attr('height', d => d.height)
+          //   .attr('fill', d => d.color)
 
-      // console.log('selection: ', selection)
+        // console.log('selection: ', selection)
 
+        // Important it is additional "rect" before "rect" which is in DOM
         // 1) individual setup
         // selection
         // .append('rect')

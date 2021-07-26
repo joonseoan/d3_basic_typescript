@@ -1,4 +1,4 @@
-import React, { FC, useRef, useEffect, useState } from 'react';
+import { FC, useRef, useEffect, useState } from 'react';
 import { select, Selection } from 'd3-selection';
 import { scaleLinear, scaleBand } from 'd3-scale';
 import { max } from 'd3-array';
@@ -42,6 +42,7 @@ const Part3_4_Scale: FC = () => {
   const [selection, setSelection] = useState<Selection<SVGSVGElement | null, unknown, null, undefined> | null>(null);
 
   const maxValue = max(mockData, d => d.number);
+  console.log('maxValue: ', maxValue);
   
   // by default domain and range is between 0 and 1.
   // but normally we specify the domain and range.
@@ -58,7 +59,8 @@ const Part3_4_Scale: FC = () => {
 
   const yAxis = axisLeft(y)
     .ticks(3)
-    .tickFormat(d => `${d} unit`)
+    .tickFormat(d => `${d} unit`);
+
   const xAxis = axisBottom(x);
   
 
@@ -67,7 +69,7 @@ const Part3_4_Scale: FC = () => {
   //   // [Real Data Range]
   //   // the first arg is the array being floor 
   //   // the second arg is the array being ceiling
-  //   // 1000: because our highest data is 9000. the ceiling should cover the highest number.
+  //   // 10000: because our highest data is 9000. the ceiling should cover the highest number.
   //   .domain([0, maxValue!])
   //   // [Changing real data range to fit in the rendering size]
   //   // since we have height of 500 like <svg height={500} /. 
@@ -105,8 +107,11 @@ const Part3_4_Scale: FC = () => {
       //   .attr('height', dimensions.height)
       //   .attr('fill', 'blue')
 
+      // Group is like grouping chart in the Power Point. 
+      // Then we can control position with all of factors.!!!
       const xAxisGroup = selection
         .append('g')
+        // ${dimensions.chartHeight} : it is because the bottom of the graph.
         .attr('transform', `translate(${dimensions.marginLeft}, ${dimensions.chartHeight})`)
         .call(xAxis)
 
@@ -124,6 +129,8 @@ const Part3_4_Scale: FC = () => {
         // each individual band.
         .selectAll('rect')
         .data(mockData)
+
+        // for additional data.
         .enter()
         .append('rect')
         // 2) with ScaleBand

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, FC } from "react";
 import { select, Selection } from 'd3-selection';
 import { scaleLinear, scaleBand } from 'd3-scale';
 import { max } from 'd3-array';
+import Randomstring from "randomstring";
 
 const mockData = [{
   name: 'foo',
@@ -34,23 +35,41 @@ const Part5_transform: FC = () => {
   const [selection, setSelection] = useState<Selection<SVGSVGElement | null, unknown, null, undefined> | null>(null);
   const [ data, setData ] = useState(mockData);
 
-  const y = scaleLinear()
+  let y = scaleLinear()
     .domain([0, max(data, d => d.units)!])
+    
+    /**
+      Not this one but example.
+      # real value range ------------------ scale down (give width and height)
+      [domain] [0, 4000]  ----------------> [400, 0]; 
+      
+      Lets say 3000 domain value.    
+      In the range between 0 and 400, the domain value will be 300.
+      But since it is inverted it is not 300 and it is 100.
 
-    // It goes from scale [0, 400] to [400, 0]
+
+      Then we have the attribute below.
+       .attr('height', d => dimensions.height - y(d.units))
+       which means ===> ('height', d => 400 - 100) ===> 300 which is length from 100.
+
+       Please find the example in data transform.png.
+     */
+    
+    
     // .range([0, dimensions.height])
     .range([dimensions.height, 0]);
 
-  const x = scaleBand()
+  let x = scaleBand()
     .domain(data.map(d => d.name))
     .range([0, dimensions.width])
-    .padding(0.05)
+    .padding(0.05);
 
   useEffect(() => {
     if (!selection) {
       setSelection(select(ref.current));
     } else {
     
+      
       selection
         // all
         .selectAll('rect')
@@ -78,17 +97,87 @@ const Part5_transform: FC = () => {
     }
   }, [selection]);
 
-  const addRandom = () => {
+  useEffect(() => {
+    if (selection) {
+      y = scaleLinear()
+        .domain([0, max(data, d => d.units)!])
+        .range([dimensions.height, 0]);
     
+      x = scaleBand()
+        .domain(data.map(d => d.name))
+        .range([0, dimensions.width])
+        .padding(0.05);  
+
+        const rects = selection.selectAll('rect').data(data)
+          
+        rects
+          // like enter selection, we have exit selection.
+          .exit()
+          // remove the existing chart?
+          .remove()
+        
+        rects
+          .attr('width', x.bandwidth)
+          .attr('height', d => dimensions.height - y(d.units))
+          .attr('x', d => { 
+    
+            const nameValue = x(d.name);
+    
+            if (!nameValue) {
+              return null;
+            }
+  
+            return nameValue
+          })
+          .attr('y', d => y(d.units))
+          .attr('fill', 'orange')
+
+        rects
+          .enter()
+          .append('rect')
+          .attr('width', x.bandwidth)
+          .attr('height', d => dimensions.height - y(d.units))
+          .attr('x', d => { 
+    
+            const nameValue = x(d.name);
+    
+            if (!nameValue) {
+              return null;
+            }
+
+            return nameValue
+          })
+          .attr('y', d => y(d.units)) 
+          .attr('fill', 'orange')
+      }
+
+
+  }, [data]);
+
+  const addRandom = () => {
+    const dataToBeAdded = {
+      name: Randomstring.generate(10),
+      units: Math.floor(Math.random() * (80) + 20),
+    }
+
+    setData([ ...data, dataToBeAdded ]);
+
   }
 
   const removeLAST = () => {
+    if (data.length === 0) {
+      return;
+    }
+    const sliceData = data.slice(0, data.length-1);
+    setData(sliceData);
 
   }
 
   return (
     <div>
       <svg ref={ref} width={dimensions.width} height={dimensions.height} />
+      <button onClick={addRandom}>Add Random</button>
+      <button onClick={removeLAST}>Remove Last</button>
     </div>
   );
 }

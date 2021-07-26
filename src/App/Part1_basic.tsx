@@ -22,6 +22,7 @@ const Part1_Basic: FC = () => {
     
     // [Single Select for svg]
     // default target is <svg> container
+    // It is additional bar, which is not in DOM.
     // select(svgRef.current)
     //   // when we put append('rect'), the target element is <rect>
     //   .append('rect') // rectangle.
@@ -29,7 +30,8 @@ const Part1_Basic: FC = () => {
     //   // the second argument: value of attribute.
     //   .attr('width', 100)
     //   .attr('height', 100)
-    //   .attr('fill', 'blue');
+    //   .attr('fill', 'purple')
+    //   .attr('x', (_, t) => t * 100)
     
     // [Multiple Select]
     // like css
@@ -37,14 +39,15 @@ const Part1_Basic: FC = () => {
     // selectAll('#id') or selectAll('.className')
     // it will stack over each other.
     selectAll('rect')
-    .attr('width', 100)
-    .attr('height', 100)
-    .attr('fill', 'blue')
-    // width space including object width size + 
-      // its white space (when value is greater than width above) 
-      // or its overrapped size (when the value is less than width above) 
-    .attr('x', (_, t) => t * 100)
-
+      // individual bard width size
+      .attr('width', 100)
+      .attr('height', 100)
+      .attr('fill', 'blue')
+    
+    // The container size of the individual bar.
+    // if the container width size > width of the bar width ==> will show white space.
+    // if the container width size < width of the bar width ===> the bar will be overlapped each other. 
+    .attr('x', (_, t) => t * 80)
   }, [])
 
   return (
